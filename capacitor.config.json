@@ -1,9 +1,5 @@
 {
-  "appId": "app.lovable.1cfa896ffd9d42bc97e9cdf1f7df03df",
+  "appId": "app.lovable.experthub",
   "appName": "ExpertHub",
-  "webDir": "dist",
-  "server": {
-    "url": "https://1cfa896f-fd9d-42bc-97e9-cdf1f7df03df.lovableproject.com?forceHideBadge=true",
-    "cleartext": true
-  }
+  "webDir": "dist"
 }
