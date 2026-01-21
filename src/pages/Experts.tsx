@@ -134,9 +134,10 @@ const Experts = () => {
           {/* Experts Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredExperts.map((expert, index) => (
-              <div
+              <Link
                 key={expert.id}
-                className={`group gradient-card rounded-2xl shadow-card p-6 hover:shadow-hover transition-all duration-300 animate-fade-up`}
+                to={`/experts/${expert.id}`}
+                className={`group gradient-card rounded-2xl shadow-card p-6 hover:shadow-hover transition-all duration-300 animate-fade-up block`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 {/* Avatar */}
@@ -161,7 +162,7 @@ const Experts = () => {
                       {expert.rating}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      ({expert.sessions} sessions)
+                      ({expert.sessions} sesji)
                     </span>
                   </div>
                 </div>
@@ -177,16 +178,22 @@ const Experts = () => {
                     <span className="font-display font-bold text-lg text-foreground">
                       ${expert.rate}
                     </span>
-                    <span className="text-sm text-muted-foreground">/session</span>
+                    <span className="text-sm text-muted-foreground">/sesja</span>
                   </div>
-                  <Link to={`/bookings?expert=${expert.id}`}>
-                    <Button size="sm" variant="soft" disabled={!expert.available}>
-                      <Video className="w-4 h-4" />
-                      {expert.available ? "Book" : "Unavailable"}
-                    </Button>
-                  </Link>
+                  <Button 
+                    size="sm" 
+                    variant="soft" 
+                    disabled={!expert.available}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.location.href = `/bookings?expert=${expert.id}`;
+                    }}
+                  >
+                    <Video className="w-4 h-4" />
+                    {expert.available ? "Umów" : "Niedostępny"}
+                  </Button>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
