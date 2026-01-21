@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ReviewsSection from "@/components/experts/ReviewsSection";
+import BookingDialog from "@/components/booking/BookingDialog";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Star, 
   Video, 
@@ -43,7 +46,7 @@ const allExperts = [
     ],
     location: "San Francisco, CA",
     experience: "15+ years",
-    nextAvailable: "Tomorrow, 10:00 AM",
+    nextAvailable: "Jutro, 10:00",
   },
   {
     id: 2,
@@ -68,7 +71,7 @@ const allExperts = [
     ],
     location: "New York, NY",
     experience: "20+ years",
-    nextAvailable: "Today, 3:00 PM",
+    nextAvailable: "Dziś, 15:00",
   },
   {
     id: 3,
@@ -93,7 +96,7 @@ const allExperts = [
     ],
     location: "Austin, TX",
     experience: "12+ years",
-    nextAvailable: "Next week",
+    nextAvailable: "Za tydzień",
   },
   {
     id: 4,
@@ -119,7 +122,7 @@ const allExperts = [
     ],
     location: "Chicago, IL",
     experience: "18+ years",
-    nextAvailable: "Tomorrow, 2:00 PM",
+    nextAvailable: "Jutro, 14:00",
   },
   {
     id: 5,
@@ -144,7 +147,7 @@ const allExperts = [
     ],
     location: "Los Angeles, CA",
     experience: "10+ years",
-    nextAvailable: "Today, 5:00 PM",
+    nextAvailable: "Dziś, 17:00",
   },
   {
     id: 6,
@@ -169,13 +172,15 @@ const allExperts = [
     ],
     location: "Miami, FL",
     experience: "8+ years",
-    nextAvailable: "Tomorrow, 11:00 AM",
+    nextAvailable: "Jutro, 11:00",
   },
 ];
 
 const ExpertProfile = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
   
   const expert = allExperts.find((e) => e.id === Number(id));
 
@@ -184,10 +189,10 @@ const ExpertProfile = () => {
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-2">Nie znaleziono lekarza</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Nie znaleziono specjalisty</h1>
             <p className="text-muted-foreground mb-4">Przepraszamy, nie mogliśmy znaleźć tego profilu.</p>
             <Link to="/experts">
-              <Button>Wróć do listy lekarzy</Button>
+              <Button>Wróć do listy specjalistów</Button>
             </Link>
           </div>
         </div>
@@ -202,6 +207,18 @@ const ExpertProfile = () => {
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleBookClick = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setBookingDialogOpen(true);
+  };
+
+  const handleBookingSuccess = () => {
+    navigate("/bookings");
   };
 
   return (
@@ -273,12 +290,15 @@ const ExpertProfile = () => {
                   <span className="font-display text-3xl font-bold text-foreground">${expert.rate}</span>
                   <span className="text-muted-foreground">/sesja</span>
                 </div>
-                <Link to={`/bookings?expert=${expert.id}`} className="w-full md:w-auto">
-                  <Button size="lg" className="w-full" disabled={!expert.available}>
-                    <Calendar className="w-5 h-5" />
-                    Umów wizytę
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="w-full" 
+                  disabled={!expert.available}
+                  onClick={handleBookClick}
+                >
+                  <Calendar className="w-5 h-5" />
+                  Umów wizytę
+                </Button>
               </div>
             </div>
 
@@ -359,12 +379,14 @@ const ExpertProfile = () => {
               Umów się na wizytę online z {expert.name.split(" ")[0]}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to={`/bookings?expert=${expert.id}`}>
-                <Button size="lg" disabled={!expert.available}>
-                  <Video className="w-5 h-5" />
-                  Umów wizytę wideo
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                disabled={!expert.available}
+                onClick={handleBookClick}
+              >
+                <Video className="w-5 h-5" />
+                Umów wizytę wideo
+              </Button>
               <Button size="lg" variant="outline" disabled={!expert.available}>
                 <MessageCircle className="w-5 h-5" />
                 Wyślij wiadomość
@@ -373,6 +395,14 @@ const ExpertProfile = () => {
           </div>
         </div>
       </section>
+
+      {/* Booking Dialog */}
+      <BookingDialog
+        expert={expert}
+        open={bookingDialogOpen}
+        onOpenChange={setBookingDialogOpen}
+        onSuccess={handleBookingSuccess}
+      />
     </Layout>
   );
 };

@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, Video, Search, Filter } from "lucide-react";
+import { Star, Video, Search } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import BookingDialog from "@/components/booking/BookingDialog";
 
 const allExperts = [
   {
@@ -77,8 +79,12 @@ const allExperts = [
 const categories = ["All", "Health", "Business", "Technology", "Finance", "Career"];
 
 const Experts = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const [selectedExpert, setSelectedExpert] = useState<typeof allExperts[0] | null>(null);
 
   const filteredExperts = allExperts.filter((expert) => {
     const matchesSearch =
@@ -89,6 +95,23 @@ const Experts = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const handleBookClick = (e: React.MouseEvent, expert: typeof allExperts[0]) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    
+    setSelectedExpert(expert);
+    setBookingDialogOpen(true);
+  };
+
+  const handleBookingSuccess = () => {
+    navigate("/bookings");
+  };
+
   return (
     <Layout>
       <section className="py-12 md:py-20 gradient-hero min-h-screen">
@@ -96,10 +119,10 @@ const Experts = () => {
           {/* Header */}
           <div className="max-w-2xl mx-auto text-center mb-12">
             <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 animate-fade-up">
-              Find Your Expert
+              Znajdź specjalistę
             </h1>
             <p className="text-lg text-muted-foreground animate-fade-up animation-delay-100">
-              Browse our curated network of verified professionals
+              Przeglądaj naszą sieć zweryfikowanych ekspertów
             </p>
           </div>
 
@@ -109,7 +132,7 @@ const Experts = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  placeholder="Search by name or specialty..."
+                  placeholder="Szukaj po nazwisku lub specjalizacji..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-12 h-12 rounded-xl"
@@ -124,7 +147,7 @@ const Experts = () => {
                     onClick={() => setSelectedCategory(category)}
                     className="whitespace-nowrap"
                   >
-                    {category}
+                    {category === "All" ? "Wszystkie" : category}
                   </Button>
                 ))}
               </div>
@@ -182,12 +205,8 @@ const Experts = () => {
                   </div>
                   <Button 
                     size="sm" 
-                    variant="soft" 
                     disabled={!expert.available}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.location.href = `/bookings?expert=${expert.id}`;
-                    }}
+                    onClick={(e) => handleBookClick(e, expert)}
                   >
                     <Video className="w-4 h-4" />
                     {expert.available ? "Umów" : "Niedostępny"}
@@ -200,12 +219,22 @@ const Experts = () => {
           {filteredExperts.length === 0 && (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground">
-                No experts found matching your criteria.
+                Nie znaleziono specjalistów spełniających kryteria.
               </p>
             </div>
           )}
         </div>
       </section>
+
+      {/* Booking Dialog */}
+      {selectedExpert && (
+        <BookingDialog
+          expert={selectedExpert}
+          open={bookingDialogOpen}
+          onOpenChange={setBookingDialogOpen}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
     </Layout>
   );
 };
