@@ -1,11 +1,14 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, Settings } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import pewnaLogo from "@/assets/pewna-logo.svg";
 
 const DashboardHeader = () => {
   const { user } = useAuth();
+  const { profile } = useProfile();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -15,7 +18,17 @@ const DashboardHeader = () => {
   };
 
   const getUserName = () => {
-    return user?.user_metadata?.full_name?.split(" ")[0] || "Użytkowniku";
+    return profile?.full_name?.split(" ")[0] || user?.user_metadata?.full_name?.split(" ")[0] || "Użytkowniku";
+  };
+
+  const getInitials = () => {
+    const name = profile?.full_name || user?.user_metadata?.full_name || "";
+    return name
+      .split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "U";
   };
 
   return (
@@ -43,10 +56,13 @@ const DashboardHeader = () => {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
             </Button>
-            <Link to="/settings">
-              <Button variant="ghost" size="icon">
-                <Settings className="w-5 h-5" />
-              </Button>
+            <Link to="/profile">
+              <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-border hover:ring-primary transition-all">
+                <AvatarImage src={profile?.avatar_url || undefined} alt="Profil" />
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
             </Link>
           </div>
         </div>

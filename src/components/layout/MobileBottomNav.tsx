@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, FileText, Pill, User } from "lucide-react";
+import { Home, Users, FileText, Pill, Calendar } from "lucide-react";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -8,8 +8,8 @@ const MobileBottomNav = () => {
     { href: "/", label: "Główna", icon: Home },
     { href: "/experts", label: "Lekarze", icon: Users },
     { href: "/medications", label: "Leki", icon: Pill },
+    { href: "/bookings", label: "Wizyty", icon: Calendar },
     { href: "/posts", label: "Artykuły", icon: FileText },
-    { href: "/profile", label: "Profil", icon: User },
   ];
 
   const isActive = (path: string) => location.pathname === path;
