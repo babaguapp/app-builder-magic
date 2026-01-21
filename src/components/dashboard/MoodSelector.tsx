@@ -58,20 +58,20 @@ const MoodSelector = () => {
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold">Jak się dziś czujesz?</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex justify-between gap-2">
+      <CardContent className="overflow-hidden">
+        <div className="flex justify-between gap-1">
           {moodOptions.map((value) => (
             <button
               key={value}
               onClick={() => handleMoodSelect(value)}
               className={cn(
-                "flex flex-col items-center gap-1 p-3 rounded-xl transition-all",
+                "flex flex-col items-center gap-1 p-2 rounded-xl transition-all flex-1 min-w-0",
                 "hover:bg-accent active:scale-95",
                 selectedMood === value && "bg-primary/10 ring-2 ring-primary"
               )}
             >
-              <span className="text-3xl">{getMoodEmoji(value)}</span>
-              <span className="text-xs text-muted-foreground">{getMoodLabel(value)}</span>
+              <span className="text-2xl sm:text-3xl">{getMoodEmoji(value)}</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground truncate w-full text-center">{getMoodLabel(value)}</span>
             </button>
           ))}
         </div>
