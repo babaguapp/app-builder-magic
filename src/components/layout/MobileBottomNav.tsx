@@ -5,11 +5,11 @@ const MobileBottomNav = () => {
   const location = useLocation();
 
   const navLinks = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/experts", label: "Experts", icon: Users },
-    { href: "/posts", label: "Posts", icon: FileText },
-    { href: "/bookings", label: "Book", icon: Calendar },
-    { href: "/auth", label: "Account", icon: User },
+    { href: "/", label: "Główna", icon: Home },
+    { href: "/experts", label: "Lekarze", icon: Users },
+    { href: "/posts", label: "Artykuły", icon: FileText },
+    { href: "/bookings", label: "Wizyty", icon: Calendar },
+    { href: "/profile", label: "Profil", icon: User },
   ];
 
   const isActive = (path: string) => location.pathname === path;
