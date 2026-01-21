@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,8 +7,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bell, ArrowRight, X } from "lucide-react";
+import { MapPin, Bell, ArrowRight } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { Capacitor } from "@capacitor/core";
 
 interface PermissionDialogProps {
   open: boolean;
@@ -20,6 +22,11 @@ type Step = "location" | "notifications" | "done";
 const PermissionDialog = ({ open, onComplete }: PermissionDialogProps) => {
   const [step, setStep] = useState<Step>("location");
   const { permissions, requestLocation, requestNotifications } = usePermissions();
+  const { isNative, permissionStatus: nativePermissionStatus, registerPushNotifications } = usePushNotifications();
+  const [isRequesting, setIsRequesting] = useState(false);
+
+  // Determine which notification permission to check
+  const notificationPermission = isNative ? nativePermissionStatus : permissions.notifications;
 
   const handleLocationRequest = async () => {
     await requestLocation();
@@ -27,8 +34,19 @@ const PermissionDialog = ({ open, onComplete }: PermissionDialogProps) => {
   };
 
   const handleNotificationRequest = async () => {
-    await requestNotifications();
-    onComplete();
+    setIsRequesting(true);
+    try {
+      if (isNative) {
+        // Use native push notifications
+        await registerPushNotifications();
+      } else {
+        // Use web notifications
+        await requestNotifications();
+      }
+    } finally {
+      setIsRequesting(false);
+      onComplete();
+    }
   };
 
   const skipLocation = () => {
@@ -38,6 +56,20 @@ const PermissionDialog = ({ open, onComplete }: PermissionDialogProps) => {
   const skipNotifications = () => {
     onComplete();
   };
+
+  // Auto-advance if location is already handled
+  useEffect(() => {
+    if (step === "location" && permissions.location !== "prompt") {
+      setStep("notifications");
+    }
+  }, [step, permissions.location]);
+
+  // Auto-complete if notifications are already handled
+  useEffect(() => {
+    if (step === "notifications" && notificationPermission !== "prompt") {
+      onComplete();
+    }
+  }, [step, notificationPermission, onComplete]);
 
   if (!open) return null;
 
@@ -68,12 +100,7 @@ const PermissionDialog = ({ open, onComplete }: PermissionDialogProps) => {
           </>
         )}
 
-        {step === "location" && permissions.location !== "prompt" && (
-          // Skip to notifications if location already handled
-          <>{setStep("notifications")}</>
-        )}
-
-        {step === "notifications" && permissions.notifications === "prompt" && (
+        {step === "notifications" && notificationPermission === "prompt" && (
           <>
             <DialogHeader className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -86,8 +113,13 @@ const PermissionDialog = ({ open, onComplete }: PermissionDialogProps) => {
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3 mt-6">
-              <Button onClick={handleNotificationRequest} size="lg" className="w-full">
-                Włącz powiadomienia
+              <Button 
+                onClick={handleNotificationRequest} 
+                size="lg" 
+                className="w-full"
+                disabled={isRequesting}
+              >
+                {isRequesting ? "Włączanie..." : "Włącz powiadomienia"}
                 <Bell className="w-5 h-5 ml-2" />
               </Button>
               <Button variant="ghost" onClick={skipNotifications} className="text-muted-foreground">
@@ -95,11 +127,6 @@ const PermissionDialog = ({ open, onComplete }: PermissionDialogProps) => {
               </Button>
             </div>
           </>
-        )}
-
-        {step === "notifications" && permissions.notifications !== "prompt" && (
-          // Auto-complete if notifications already handled
-          <>{onComplete()}</>
         )}
       </DialogContent>
     </Dialog>
