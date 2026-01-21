@@ -36,8 +36,8 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <DashboardHeader />
       
-      <main className="pt-[calc(6rem+env(safe-area-inset-top))] md:pt-24 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8">
-        <div className="container mx-auto px-4">
+      <main className="pt-[calc(6rem+env(safe-area-inset-top))] md:pt-24 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8 overflow-x-hidden">
+        <div className="container mx-auto px-3 sm:px-4">
           <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Mood Section - Full width on mobile */}
             <div className="md:col-span-2 lg:col-span-2 space-y-4">
