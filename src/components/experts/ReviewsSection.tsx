@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Star, MessageSquare } from "lucide-react";
+import { Star, MessageSquare, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import ReviewForm from "./ReviewForm";
 import ReviewCard from "./ReviewCard";
 import { useReviews } from "@/hooks/useReviews";
 import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 interface ReviewsSectionProps {
   expertId: number;
@@ -18,6 +20,8 @@ const ReviewsSection = ({ expertId, expertName }: ReviewsSectionProps) => {
     reviews,
     loading,
     userReview,
+    canReview,
+    completedConsultations,
     averageRating,
     reviewCount,
     addReview,
@@ -28,7 +32,9 @@ const ReviewsSection = ({ expertId, expertName }: ReviewsSectionProps) => {
   const [showForm, setShowForm] = useState(false);
 
   const handleAddReview = async (rating: number, comment: string) => {
-    const success = await addReview(rating, comment);
+    // Find first consultation without a review
+    const unreviewedConsultation = completedConsultations.find((c) => !c.hasReview);
+    const success = await addReview(rating, comment, unreviewedConsultation?.id);
     if (success) setShowForm(false);
     return success;
   };
@@ -70,15 +76,28 @@ const ReviewsSection = ({ expertId, expertName }: ReviewsSectionProps) => {
           )}
         </div>
 
-        {user && !userReview && !showForm && (
+        {user && canReview && !showForm && (
           <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>
             Dodaj opinię
           </Button>
         )}
       </div>
 
+      {/* Info about review eligibility */}
+      {user && !canReview && !userReview && (
+        <Alert className="mb-6">
+          <CalendarCheck className="h-4 w-4" />
+          <AlertDescription>
+            Aby wystawić opinię, musisz najpierw odbyć wizytę z tym specjalistą.{" "}
+            <Link to={`/bookings?expert=${expertId}`} className="text-primary hover:underline font-medium">
+              Umów wizytę
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Add Review Form */}
-      {showForm && !userReview && (
+      {showForm && canReview && (
         <div className="mb-6 p-4 bg-muted/50 rounded-xl">
           <h3 className="font-medium text-foreground mb-3">
             Wystaw opinię dla {expertName}
@@ -107,16 +126,21 @@ const ReviewsSection = ({ expertId, expertName }: ReviewsSectionProps) => {
         <div className="text-center py-8">
           <MessageSquare className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
           <p className="text-muted-foreground mb-2">
-            Brak opinii dla tego lekarza
+            Brak opinii dla tego specjalisty
           </p>
-          {user && !showForm && (
+          {user && canReview && !showForm && (
             <Button variant="soft" size="sm" onClick={() => setShowForm(true)}>
               Bądź pierwszy i wystaw opinię
             </Button>
           )}
+          {user && !canReview && !userReview && (
+            <p className="text-sm text-muted-foreground">
+              Opinie mogą wystawiać tylko pacjenci po odbytej wizycie
+            </p>
+          )}
           {!user && (
             <p className="text-sm text-muted-foreground">
-              Zaloguj się, aby dodać opinię
+              Zaloguj się, aby zobaczyć więcej
             </p>
           )}
         </div>

@@ -15,10 +15,19 @@ export interface Review {
   user_name?: string;
 }
 
+export interface CompletedConsultation {
+  id: string;
+  expert_name: string;
+  scheduled_at: string;
+  hasReview: boolean;
+}
+
 export const useReviews = (expertId?: number) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [userReview, setUserReview] = useState<Review | null>(null);
+  const [completedConsultations, setCompletedConsultations] = useState<CompletedConsultation[]>([]);
+  const [canReview, setCanReview] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -30,6 +39,7 @@ export const useReviews = (expertId?: number) => {
 
     try {
       setLoading(true);
+      // Fetch reviews
       const { data, error } = await supabase
         .from("reviews")
         .select("*")
@@ -45,7 +55,7 @@ export const useReviews = (expertId?: number) => {
             .from("profiles")
             .select("full_name")
             .eq("user_id", review.user_id)
-            .single();
+            .maybeSingle();
 
           return {
             ...review,
@@ -60,6 +70,36 @@ export const useReviews = (expertId?: number) => {
       if (user) {
         const ownReview = reviewsWithNames.find((r) => r.user_id === user.id);
         setUserReview(ownReview || null);
+
+        // Check for completed consultations with this expert
+        const { data: consultationsData } = await supabase
+          .from("user_consultations")
+          .select("id, expert_name, scheduled_at")
+          .eq("user_id", user.id)
+          .eq("status", "completed")
+          .lt("scheduled_at", new Date().toISOString());
+
+        if (consultationsData && consultationsData.length > 0) {
+          // Check which consultations already have reviews
+          const consultationsWithReviewStatus = consultationsData.map((consultation) => {
+            const hasReview = reviewsWithNames.some(
+              (r) => r.consultation_id === consultation.id && r.user_id === user.id
+            );
+            return {
+              ...consultation,
+              hasReview,
+            };
+          });
+
+          setCompletedConsultations(consultationsWithReviewStatus);
+          
+          // User can review if they have at least one consultation without a review
+          const hasUnreviewedConsultation = consultationsWithReviewStatus.some((c) => !c.hasReview);
+          setCanReview(hasUnreviewedConsultation && !ownReview);
+        } else {
+          setCompletedConsultations([]);
+          setCanReview(false);
+        }
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -187,6 +227,8 @@ export const useReviews = (expertId?: number) => {
     reviews,
     loading,
     userReview,
+    canReview,
+    completedConsultations,
     averageRating,
     reviewCount: reviews.length,
     addReview,
