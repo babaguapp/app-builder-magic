@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Experts from "./pages/Experts";
 import Posts from "./pages/Posts";
 import Bookings from "./pages/Bookings";
+import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,11 @@ const App = () => (
             <Route path="/bookings" element={
               <ProtectedRoute>
                 <Bookings />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } />
             
