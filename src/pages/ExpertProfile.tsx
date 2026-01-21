@@ -3,6 +3,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ReviewsSection from "@/components/experts/ReviewsSection";
 import { 
   Star, 
   Video, 
@@ -13,7 +14,6 @@ import {
   Award,
   ArrowLeft,
   MessageCircle,
-  Heart
 } from "lucide-react";
 
 // Mock data - in a real app this would come from the database
@@ -347,8 +347,11 @@ const ExpertProfile = () => {
             </div>
           </div>
 
+          {/* Reviews Section */}
+          <ReviewsSection expertId={expert.id} expertName={expert.name} />
+
           {/* CTA Card */}
-          <div className="gradient-card rounded-2xl shadow-card p-6 text-center">
+          <div className="gradient-card rounded-2xl shadow-card p-6 text-center mt-6">
             <h3 className="font-display text-xl font-semibold text-foreground mb-2">
               Gotowy na konsultację?
             </h3>
