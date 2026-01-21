@@ -53,8 +53,10 @@ const DashboardHeader = () => {
 
         {/* Greeting (mobile) */}
         <div className="md:hidden pb-2">
-          <p className="text-sm text-muted-foreground">{getGreeting()}</p>
-          <p className="font-semibold text-lg text-foreground">{getUserName()}</p>
+          <p className="text-lg font-semibold text-foreground">
+            <span className="text-sm font-normal text-muted-foreground">{getGreeting()}, </span>
+            {getUserName()}
+          </p>
         </div>
       </div>
     </header>

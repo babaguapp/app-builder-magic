@@ -40,10 +40,10 @@ const articles = [
 const LatestArticles = () => {
   return (
     <Card className="gradient-card shadow-card">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-semibold">Najnowsze artykuły</CardTitle>
-        <Link to="/posts">
-          <Button variant="ghost" size="sm" className="text-primary">
+      <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2">
+        <CardTitle className="text-lg font-semibold whitespace-nowrap">Najnowsze artykuły</CardTitle>
+        <Link to="/posts" className="shrink-0">
+          <Button variant="ghost" size="sm" className="text-primary text-xs px-2">
             Zobacz wszystkie
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
