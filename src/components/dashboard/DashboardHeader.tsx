@@ -55,7 +55,7 @@ const DashboardHeader = () => {
         <div className="md:hidden pb-2">
           <p className="text-lg font-semibold text-foreground">
             <span className="text-sm font-normal text-muted-foreground">{getGreeting()}, </span>
-            {getUserName()}
+            {getUserName()}.
           </p>
         </div>
       </div>
