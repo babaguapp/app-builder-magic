@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -139,9 +140,10 @@ const Posts = () => {
           {/* Posts Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post, index) => (
-              <article
+              <Link
                 key={post.id}
-                className="group gradient-card rounded-2xl shadow-card overflow-hidden hover:shadow-hover transition-all duration-300 animate-fade-up"
+                to={`/posts/${post.id}`}
+                className="group gradient-card rounded-2xl shadow-card overflow-hidden hover:shadow-hover transition-all duration-300 animate-fade-up block"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="aspect-[16/9] bg-gradient-to-br from-accent to-primary/20" />
@@ -175,21 +177,18 @@ const Posts = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors">
+                      <span className="flex items-center gap-1 text-muted-foreground">
                         <Heart className="w-4 h-4" />
                         <span className="text-xs">{post.likes}</span>
-                      </button>
-                      <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors">
+                      </span>
+                      <span className="flex items-center gap-1 text-muted-foreground">
                         <MessageCircle className="w-4 h-4" />
                         <span className="text-xs">{post.comments}</span>
-                      </button>
-                      <button className="text-muted-foreground hover:text-primary transition-colors">
-                        <Bookmark className="w-4 h-4" />
-                      </button>
+                      </span>
                     </div>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
 

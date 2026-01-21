@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Experts from "./pages/Experts";
 import ExpertProfile from "./pages/ExpertProfile";
 import Posts from "./pages/Posts";
+import PostDetail from "./pages/PostDetail";
 import Bookings from "./pages/Bookings";
 import Profile from "./pages/Profile";
 import Medications from "./pages/Medications";
@@ -47,6 +48,11 @@ const App = () => (
             <Route path="/posts" element={
               <ProtectedRoute>
                 <Posts />
+              </ProtectedRoute>
+            } />
+            <Route path="/posts/:id" element={
+              <ProtectedRoute>
+                <PostDetail />
               </ProtectedRoute>
             } />
             <Route path="/bookings" element={
