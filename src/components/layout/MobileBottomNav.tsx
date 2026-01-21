@@ -6,7 +6,7 @@ const MobileBottomNav = () => {
 
   const navLinks = [
     { href: "/", label: "Główna", icon: Home },
-    { href: "/experts", label: "Lekarze", icon: Users },
+    { href: "/experts", label: "Specjaliści", icon: Users },
     { href: "/medications", label: "Leki", icon: Pill },
     { href: "/bookings", label: "Wizyty", icon: Calendar },
     { href: "/posts", label: "Artykuły", icon: FileText },
