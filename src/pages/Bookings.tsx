@@ -98,32 +98,34 @@ const Bookings = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  upcomingConsultations.map((consultation) => (
-                    <ConsultationCard
-                      key={consultation.id}
-                      consultation={consultation}
-                      variant="upcoming"
-                      onUpdate={refetch}
-                    />
-                  ))
+                  <>
+                    {upcomingConsultations.map((consultation) => (
+                      <ConsultationCard
+                        key={consultation.id}
+                        consultation={consultation}
+                        variant="upcoming"
+                        onUpdate={refetch}
+                      />
+                    ))}
+
+                    {/* Disclaimer - only in upcoming tab */}
+                    <div className="mt-4">
+                      <div className="flex items-start gap-3 p-4 bg-secondary/50 border border-border rounded-xl">
+                        <Info className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="text-sm text-muted-foreground">
+                          <p className="font-medium text-foreground mb-1">Informacja o zmianach w rezerwacjach</p>
+                          <p>
+                            Prosimy o wprowadzanie wszelkich zmian w umówionych konsultacjach (zmiana terminu lub odwołanie) 
+                            z co najmniej <strong className="text-foreground">24-godzinnym wyprzedzeniem</strong>. 
+                            Dzięki temu nasi specjaliści mogą lepiej zaplanować swój czas, a Ty zyskujesz pewność, 
+                            że Twoja wizyta odbędzie się bez przeszkód. Dziękujemy za zrozumienie! 💙
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 )}
               </TabsContent>
-
-              {/* Disclaimer */}
-              <div className="mt-8">
-                <div className="flex items-start gap-3 p-4 bg-secondary/50 border border-border rounded-xl">
-                  <Info className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground mb-1">Informacja o zmianach w rezerwacjach</p>
-                    <p>
-                      Prosimy o wprowadzanie wszelkich zmian w umówionych konsultacjach (zmiana terminu lub odwołanie) 
-                      z co najmniej <strong className="text-foreground">24-godzinnym wyprzedzeniem</strong>. 
-                      Dzięki temu nasi specjaliści mogą lepiej zaplanować swój czas, a Ty zyskujesz pewność, 
-                      że Twoja wizyta odbędzie się bez przeszkód. Dziękujemy za zrozumienie! 💙
-                    </p>
-                  </div>
-                </div>
-              </div>
 
               {/* Completed Consultations */}
               <TabsContent value="completed" className="space-y-4">
