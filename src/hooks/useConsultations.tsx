@@ -10,6 +10,7 @@ export interface Consultation {
   status: "scheduled" | "completed" | "cancelled";
   notes: string | null;
   created_at: string;
+  consultation_type: "online" | "in_person" | null;
 }
 
 export const useConsultations = () => {
