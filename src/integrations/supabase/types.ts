@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      articles: {
+        Row: {
+          author: string
+          author_bio: string | null
+          category: string
+          comments: number
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          image_url: string | null
+          is_published: boolean
+          likes: number
+          read_time: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          author_bio?: string | null
+          category: string
+          comments?: number
+          content: string
+          created_at?: string
+          excerpt: string
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          likes?: number
+          read_time?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          author_bio?: string | null
+          category?: string
+          comments?: number
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          likes?: number
+          read_time?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       device_tokens: {
         Row: {
           created_at: string
