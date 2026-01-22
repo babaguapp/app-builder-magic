@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Calendar, Clock, User, Video, Star, CalendarClock, X } from "lucide-react";
+import { Calendar, Clock, User, Video, Star, CalendarClock, X, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import RescheduleDialog from "./RescheduleDialog";
@@ -77,8 +77,17 @@ const ConsultationCard = ({ consultation, variant, onUpdate }: ConsultationCardP
                 </div>
                 {isUpcoming && (
                   <div className="flex items-center gap-2">
-                    <Video className="w-4 h-4 text-primary" />
-                    <span className="text-muted-foreground">Wideorozmowa</span>
+                    {consultation.consultation_type === "in_person" ? (
+                      <>
+                        <MapPin className="w-4 h-4 text-primary" />
+                        <span className="text-muted-foreground">Wizyta stacjonarna</span>
+                      </>
+                    ) : (
+                      <>
+                        <Video className="w-4 h-4 text-primary" />
+                        <span className="text-muted-foreground">Wideorozmowa</span>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
