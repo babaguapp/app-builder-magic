@@ -96,7 +96,7 @@ const ConsultationCard = ({ consultation, variant, onUpdate }: ConsultationCardP
             {/* Actions Row */}
             <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
               {isUpcoming ? (
-                <>
+                <div className="flex items-center gap-3">
                   <Button
                     variant="outline"
                     size="sm"
@@ -115,7 +115,7 @@ const ConsultationCard = ({ consultation, variant, onUpdate }: ConsultationCardP
                     <X className="w-4 h-4" />
                     Odwołaj wizytę
                   </Button>
-                </>
+                </div>
               ) : (
                 <Link to={`/experts/${expertId}#reviews`}>
                   <Button variant="default" size="sm" className="gap-2">
@@ -124,14 +124,6 @@ const ConsultationCard = ({ consultation, variant, onUpdate }: ConsultationCardP
                   </Button>
                 </Link>
               )}
-
-              {/* Profile Link */}
-              <Link to={`/experts/${expertId}`} className="ml-auto">
-                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
-                  <User className="w-4 h-4" />
-                  Zobacz profil
-                </Button>
-              </Link>
             </div>
           </div>
         </CardContent>
