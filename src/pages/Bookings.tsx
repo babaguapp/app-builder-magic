@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, User, Star, Video, Plus } from "lucide-react";
-import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { Calendar, Clock, Plus, Info } from "lucide-react";
 import { useConsultations } from "@/hooks/useConsultations";
+import ConsultationCard from "@/components/booking/ConsultationCard";
 
 const Bookings = () => {
   const navigate = useNavigate();
-  const { consultations, loading } = useConsultations();
+  const { consultations, loading, refetch } = useConsultations();
   const [activeTab, setActiveTab] = useState("upcoming");
 
   const now = new Date();
@@ -66,6 +65,22 @@ const Bookings = () => {
             </Button>
           </div>
 
+          {/* Disclaimer */}
+          <div className="max-w-4xl mx-auto mb-6 animate-fade-up animation-delay-250">
+            <div className="flex items-start gap-3 p-4 bg-secondary/50 border border-border rounded-xl">
+              <Info className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-muted-foreground">
+                <p className="font-medium text-foreground mb-1">Informacja o zmianach w rezerwacjach</p>
+                <p>
+                  Prosimy o wprowadzanie wszelkich zmian w umówionych konsultacjach (zmiana terminu lub odwołanie) 
+                  z co najmniej <strong className="text-foreground">24-godzinnym wyprzedzeniem</strong>. 
+                  Dzięki temu nasi specjaliści mogą lepiej zaplanować swój czas, a Ty zyskujesz pewność, 
+                  że Twoja wizyta odbędzie się bez przeszkód. Dziękujemy za zrozumienie! 💙
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Tabs */}
           <div className="max-w-4xl mx-auto animate-fade-up animation-delay-300">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -99,59 +114,14 @@ const Bookings = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  upcomingConsultations.map((consultation) => {
-                    const date = new Date(consultation.scheduled_at);
-                    return (
-                      <Card key={consultation.id} className="gradient-card shadow-card hover:shadow-hover transition-all">
-                        <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center gap-4">
-                            {/* Expert Info */}
-                            <div className="flex items-center gap-4 flex-1">
-                              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-accent flex items-center justify-center">
-                                <User className="w-7 h-7 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg text-foreground">
-                                  {consultation.expert_name}
-                                </h3>
-                                <p className="text-muted-foreground">
-                                  {consultation.expert_specialty}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Date & Time */}
-                            <div className="flex items-center gap-6 text-sm">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-primary" />
-                                <span className="font-medium">
-                                  {format(date, "d MMMM yyyy", { locale: pl })}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-primary" />
-                                <span className="font-medium">
-                                  {format(date, "HH:mm")}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Video className="w-4 h-4 text-primary" />
-                                <span className="text-muted-foreground">Wideorozmowa</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {consultation.notes && (
-                            <div className="mt-4 p-3 bg-secondary rounded-lg">
-                              <p className="text-sm text-muted-foreground">
-                                <span className="font-medium">Notatki:</span> {consultation.notes}
-                              </p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    );
-                  })
+                  upcomingConsultations.map((consultation) => (
+                    <ConsultationCard
+                      key={consultation.id}
+                      consultation={consultation}
+                      variant="upcoming"
+                      onUpdate={refetch}
+                    />
+                  ))
                 )}
               </TabsContent>
 
@@ -174,68 +144,14 @@ const Bookings = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  completedConsultations.map((consultation) => {
-                    const date = new Date(consultation.scheduled_at);
-                    // Extract expert ID from name for review link (simplified - in production you'd have expert_id)
-                    const expertId = consultation.expert_name.toLowerCase().includes("chen") ? 1 :
-                                    consultation.expert_name.toLowerCase().includes("kowalski") ? 2 :
-                                    consultation.expert_name.toLowerCase().includes("nowak") ? 3 : 1;
-                    
-                    return (
-                      <Card key={consultation.id} className="gradient-card shadow-card hover:shadow-hover transition-all">
-                        <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center gap-4">
-                            {/* Expert Info */}
-                            <div className="flex items-center gap-4 flex-1">
-                              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-muted to-accent/50 flex items-center justify-center">
-                                <User className="w-7 h-7 text-muted-foreground" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg text-foreground">
-                                  {consultation.expert_name}
-                                </h3>
-                                <p className="text-muted-foreground">
-                                  {consultation.expert_specialty}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Date & Time */}
-                            <div className="flex items-center gap-4 text-sm">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">
-                                  {format(date, "d MMMM yyyy", { locale: pl })}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">
-                                  {format(date, "HH:mm")}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Review CTA */}
-                            <Link to={`/experts/${expertId}#reviews`}>
-                              <Button variant="default" size="sm" className="gap-2">
-                                <Star className="w-4 h-4" />
-                                Wystaw opinię
-                              </Button>
-                            </Link>
-                          </div>
-
-                          {consultation.notes && (
-                            <div className="mt-4 p-3 bg-secondary rounded-lg">
-                              <p className="text-sm text-muted-foreground">
-                                <span className="font-medium">Notatki:</span> {consultation.notes}
-                              </p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    );
-                  })
+                  completedConsultations.map((consultation) => (
+                    <ConsultationCard
+                      key={consultation.id}
+                      consultation={consultation}
+                      variant="completed"
+                      onUpdate={refetch}
+                    />
+                  ))
                 )}
               </TabsContent>
             </Tabs>
