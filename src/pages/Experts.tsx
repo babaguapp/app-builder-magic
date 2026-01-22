@@ -1,109 +1,45 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Star, Video, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import BookingDialog from "@/components/booking/BookingDialog";
-
-const allExperts = [
-  {
-    id: 1,
-    name: "Dr. Sarah Chen",
-    specialty: "Health & Wellness",
-    category: "Health",
-    rating: 4.9,
-    sessions: 342,
-    rate: 150,
-    bio: "Board-certified physician with 15+ years in integrative medicine.",
-    available: true,
-  },
-  {
-    id: 2,
-    name: "Marcus Reid",
-    specialty: "Business Strategy",
-    category: "Business",
-    rating: 4.8,
-    sessions: 521,
-    rate: 200,
-    bio: "Former Fortune 500 executive, startup advisor and mentor.",
-    available: true,
-  },
-  {
-    id: 3,
-    name: "Emily Torres",
-    specialty: "Tech & Innovation",
-    category: "Technology",
-    rating: 5.0,
-    sessions: 189,
-    rate: 175,
-    bio: "AI researcher and tech entrepreneur with 3 successful exits.",
-    available: false,
-  },
-  {
-    id: 4,
-    name: "Dr. James Okonkwo",
-    specialty: "Mental Health",
-    category: "Health",
-    rating: 4.9,
-    sessions: 456,
-    rate: 180,
-    bio: "Licensed psychologist specializing in cognitive behavioral therapy.",
-    available: true,
-  },
-  {
-    id: 5,
-    name: "Lisa Wang",
-    specialty: "Financial Planning",
-    category: "Finance",
-    rating: 4.7,
-    sessions: 298,
-    rate: 165,
-    bio: "Certified financial planner helping clients build wealth for 10+ years.",
-    available: true,
-  },
-  {
-    id: 6,
-    name: "Alex Rivera",
-    specialty: "Career Coaching",
-    category: "Career",
-    rating: 4.8,
-    sessions: 412,
-    rate: 120,
-    bio: "Executive coach who has helped 500+ professionals land their dream jobs.",
-    available: true,
-  },
-];
-
-const categories = ["All", "Health", "Business", "Technology", "Finance", "Career"];
+import ExpertFilters from "@/components/experts/ExpertFilters";
+import ExpertCard from "@/components/experts/ExpertCard";
+import {
+  useExperts,
+  useExpertCities,
+  useExpertCategories,
+  Expert,
+  ExpertFilters as FiltersType,
+} from "@/hooks/useExperts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Experts = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
-  const [selectedExpert, setSelectedExpert] = useState<typeof allExperts[0] | null>(null);
-
-  const filteredExperts = allExperts.filter((expert) => {
-    const matchesSearch =
-      expert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expert.specialty.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || expert.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+  const [filters, setFilters] = useState<FiltersType>({
+    search: "",
+    category: "All",
+    city: "all",
+    consultationType: "all",
+    gender: "all",
   });
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const [selectedExpert, setSelectedExpert] = useState<Expert | null>(null);
 
-  const handleBookClick = (e: React.MouseEvent, expert: typeof allExperts[0]) => {
+  const { data: experts, isLoading: expertsLoading } = useExperts(filters);
+  const { data: cities = [] } = useExpertCities();
+  const { data: categories = [] } = useExpertCategories();
+
+  const handleBookClick = (e: React.MouseEvent, expert: Expert) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!user) {
       navigate("/auth");
       return;
     }
-    
+
     setSelectedExpert(expert);
     setBookingDialogOpen(true);
   };
@@ -126,97 +62,48 @@ const Experts = () => {
             </p>
           </div>
 
-          {/* Search & Filter */}
-          <div className="max-w-4xl mx-auto mb-12 animate-fade-up animation-delay-200">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  placeholder="Szukaj po nazwisku lub specjalizacji..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 rounded-xl"
-                />
-              </div>
-              <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "secondary"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category)}
-                    className="whitespace-nowrap"
-                  >
-                    {category === "All" ? "Wszystkie" : category}
-                  </Button>
-                ))}
-              </div>
-            </div>
+          {/* Filters */}
+          <div className="max-w-6xl mx-auto mb-12 animate-fade-up animation-delay-200">
+            <ExpertFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              cities={cities}
+              categories={categories}
+            />
           </div>
+
+          {/* Loading State */}
+          {expertsLoading && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="gradient-card rounded-2xl p-6">
+                  <Skeleton className="w-20 h-20 rounded-full mx-auto mb-4" />
+                  <Skeleton className="h-5 w-32 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-24 mx-auto mb-4" />
+                  <Skeleton className="h-16 w-full mb-4" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Experts Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredExperts.map((expert, index) => (
-              <Link
-                key={expert.id}
-                to={`/experts/${expert.id}`}
-                className={`group gradient-card rounded-2xl shadow-card p-6 hover:shadow-hover transition-all duration-300 animate-fade-up block`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {/* Avatar */}
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-accent" />
-                  {expert.available && (
-                    <div className="absolute bottom-0 right-1/2 translate-x-8 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
-                  )}
+          {!expertsLoading && experts && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {experts.map((expert, index) => (
+                <div
+                  key={expert.id}
+                  className="animate-fade-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <ExpertCard expert={expert} onBookClick={handleBookClick} />
                 </div>
+              ))}
+            </div>
+          )}
 
-                {/* Info */}
-                <div className="text-center mb-4">
-                  <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                    {expert.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {expert.specialty}
-                  </p>
-                  <div className="flex items-center justify-center gap-1 mb-2">
-                    <Star className="w-4 h-4 text-primary fill-primary" />
-                    <span className="text-sm font-medium text-foreground">
-                      {expert.rating}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      ({expert.sessions} sesji)
-                    </span>
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <p className="text-sm text-muted-foreground text-center mb-4 line-clamp-2">
-                  {expert.bio}
-                </p>
-
-                {/* Price & Action */}
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div>
-                    <span className="font-display font-bold text-lg text-foreground">
-                      ${expert.rate}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/sesja</span>
-                  </div>
-                  <Button 
-                    size="sm" 
-                    disabled={!expert.available}
-                    onClick={(e) => handleBookClick(e, expert)}
-                  >
-                    <Video className="w-4 h-4" />
-                    {expert.available ? "Umów" : "Niedostępny"}
-                  </Button>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {filteredExperts.length === 0 && (
+          {/* Empty State */}
+          {!expertsLoading && experts?.length === 0 && (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground">
                 Nie znaleziono specjalistów spełniających kryteria.

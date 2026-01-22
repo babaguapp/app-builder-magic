@@ -41,6 +41,81 @@ export type Database = {
         }
         Relationships: []
       }
+      experts: {
+        Row: {
+          available_slots_in_person: Json | null
+          available_slots_online: Json | null
+          avatar_url: string | null
+          bio: string | null
+          category: string
+          certifications: string[] | null
+          city: string
+          created_at: string
+          education: string[] | null
+          gender: string
+          id: string
+          is_active: boolean | null
+          languages: string[] | null
+          name: string
+          offers_in_person: boolean | null
+          offers_online: boolean | null
+          rate_in_person: number | null
+          rate_online: number | null
+          rating: number | null
+          sessions_count: number | null
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          available_slots_in_person?: Json | null
+          available_slots_online?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          category: string
+          certifications?: string[] | null
+          city: string
+          created_at?: string
+          education?: string[] | null
+          gender: string
+          id?: string
+          is_active?: boolean | null
+          languages?: string[] | null
+          name: string
+          offers_in_person?: boolean | null
+          offers_online?: boolean | null
+          rate_in_person?: number | null
+          rate_online?: number | null
+          rating?: number | null
+          sessions_count?: number | null
+          specialty: string
+          updated_at?: string
+        }
+        Update: {
+          available_slots_in_person?: Json | null
+          available_slots_online?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          category?: string
+          certifications?: string[] | null
+          city?: string
+          created_at?: string
+          education?: string[] | null
+          gender?: string
+          id?: string
+          is_active?: boolean | null
+          languages?: string[] | null
+          name?: string
+          offers_in_person?: boolean | null
+          offers_online?: boolean | null
+          rate_in_person?: number | null
+          rate_online?: number | null
+          rating?: number | null
+          sessions_count?: number | null
+          specialty?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       medication_logs: {
         Row: {
           created_at: string
@@ -266,7 +341,9 @@ export type Database = {
       }
       user_consultations: {
         Row: {
+          consultation_type: string | null
           created_at: string
+          expert_id: string | null
           expert_name: string
           expert_specialty: string
           id: string
@@ -276,7 +353,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          consultation_type?: string | null
           created_at?: string
+          expert_id?: string | null
           expert_name: string
           expert_specialty: string
           id?: string
@@ -286,7 +365,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          consultation_type?: string | null
           created_at?: string
+          expert_id?: string | null
           expert_name?: string
           expert_specialty?: string
           id?: string
@@ -295,7 +376,15 @@ export type Database = {
           status?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_consultations_expert_id_fkey"
+            columns: ["expert_id"]
+            isOneToOne: false
+            referencedRelation: "experts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
