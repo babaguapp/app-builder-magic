@@ -16,6 +16,20 @@ import Medications from "./pages/Medications";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminExperts from "./pages/admin/AdminExperts";
+import AdminArticles from "./pages/admin/AdminArticles";
+import AdminRoles from "./pages/admin/AdminRoles";
+
+// Specialist pages
+import SpecialistDashboard from "./pages/specialist/SpecialistDashboard";
+import SpecialistCalendar from "./pages/specialist/SpecialistCalendar";
+import SpecialistConsultations from "./pages/specialist/SpecialistConsultations";
+import SpecialistArticles from "./pages/specialist/SpecialistArticles";
+import SpecialistProfile from "./pages/specialist/SpecialistProfile";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -68,6 +82,60 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+
+            {/* Admin routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedRoute>
+                <AdminUsers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/experts" element={
+              <ProtectedRoute>
+                <AdminExperts />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/articles" element={
+              <ProtectedRoute>
+                <AdminArticles />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/roles" element={
+              <ProtectedRoute>
+                <AdminRoles />
+              </ProtectedRoute>
+            } />
+
+            {/* Specialist routes */}
+            <Route path="/specialist" element={
+              <ProtectedRoute>
+                <SpecialistDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/specialist/calendar" element={
+              <ProtectedRoute>
+                <SpecialistCalendar />
+              </ProtectedRoute>
+            } />
+            <Route path="/specialist/consultations" element={
+              <ProtectedRoute>
+                <SpecialistConsultations />
+              </ProtectedRoute>
+            } />
+            <Route path="/specialist/articles" element={
+              <ProtectedRoute>
+                <SpecialistArticles />
+              </ProtectedRoute>
+            } />
+            <Route path="/specialist/profile" element={
+              <ProtectedRoute>
+                <SpecialistProfile />
               </ProtectedRoute>
             } />
             
