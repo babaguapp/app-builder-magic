@@ -162,14 +162,17 @@ export const CreateExpertDialog = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Przypisz do użytkownika (opcjonalnie)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select 
+                      onValueChange={(value) => field.onChange(value === "none" ? "" : value)} 
+                      value={field.value || "none"}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Wybierz użytkownika" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Brak</SelectItem>
+                        <SelectItem value="none">Brak</SelectItem>
                         {users.map((user) => (
                           <SelectItem key={user.user_id} value={user.user_id}>
                             {user.full_name || user.user_id.slice(0, 8) + "..."}
