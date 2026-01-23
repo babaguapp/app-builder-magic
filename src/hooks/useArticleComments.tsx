@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -14,6 +14,8 @@ export interface ArticleComment {
   user_name?: string;
 }
 
+const COMMENTS_PER_PAGE = 10;
+
 const commentSchema = z.object({
   content: z.string()
     .trim()
@@ -22,31 +24,46 @@ const commentSchema = z.object({
 });
 
 export const useArticleComments = (articleId: string) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["article-comments", articleId],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
+      const from = pageParam * COMMENTS_PER_PAGE;
+      const to = from + COMMENTS_PER_PAGE - 1;
+
       const { data: comments, error } = await supabase
         .from("article_comments")
         .select("*")
         .eq("article_id", articleId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
 
       // Fetch user profiles for comments
       const userIds = [...new Set(comments.map(c => c.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name")
-        .in("user_id", userIds);
+      
+      let profileMap = new Map<string, string | null>();
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name")
+          .in("user_id", userIds);
+        
+        profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+      }
 
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
-
-      return comments.map(comment => ({
+      const commentsWithNames = comments.map(comment => ({
         ...comment,
         user_name: profileMap.get(comment.user_id) || "Anonim",
       })) as ArticleComment[];
+
+      return {
+        comments: commentsWithNames,
+        nextPage: comments.length === COMMENTS_PER_PAGE ? pageParam + 1 : undefined,
+      };
     },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
     enabled: !!articleId,
   });
 };
