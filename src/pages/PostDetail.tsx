@@ -16,12 +16,15 @@ import {
 } from "lucide-react";
 import { useArticle } from "@/hooks/useArticles";
 import { LikeButton } from "@/components/articles/LikeButton";
+import { CommentsSection } from "@/components/articles/CommentsSection";
+import { useArticleCommentsCount } from "@/hooks/useArticleComments";
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
   const { data: article, isLoading, error } = useArticle(id || "");
+  const { data: commentsCount = 0 } = useArticleCommentsCount(id || "");
 
   const getInitials = (name: string) => {
     return name
@@ -166,10 +169,13 @@ const PostDetail = () => {
             </div>
             <div className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-muted-foreground" />
-              <span className="font-medium">{article.comments}</span>
+              <span className="font-medium">{commentsCount}</span>
               <span className="text-muted-foreground">komentarzy</span>
             </div>
           </div>
+
+          {/* Comments Section */}
+          <CommentsSection articleId={article.id} />
 
           {/* Back to Articles */}
           <div className="text-center mt-8">
