@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { MessageCircle, Send, Trash2, Loader2 } from "lucide-react";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
-import { useArticleComments, useAddArticleComment, useDeleteArticleComment } from "@/hooks/useArticleComments";
+import { useArticleComments, useAddArticleComment, useDeleteArticleComment, useArticleCommentsCount } from "@/hooks/useArticleComments";
 import { Link } from "react-router-dom";
 
 interface CommentsSectionProps {
@@ -17,10 +17,42 @@ interface CommentsSectionProps {
 export const CommentsSection = ({ articleId }: CommentsSectionProps) => {
   const { user } = useAuth();
   const [newComment, setNewComment] = useState("");
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   
-  const { data: comments = [], isLoading } = useArticleComments(articleId);
+  const { 
+    data, 
+    isLoading, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage 
+  } = useArticleComments(articleId);
+  
+  const { data: totalCount = 0 } = useArticleCommentsCount(articleId);
   const { mutate: addComment, isPending: isAdding } = useAddArticleComment(articleId);
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteArticleComment(articleId);
+
+  // Flatten all pages into a single array
+  const comments = useMemo(() => {
+    return data?.pages.flatMap(page => page.comments) || [];
+  }, [data]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const getInitials = (name: string) => {
     return name
@@ -44,7 +76,7 @@ export const CommentsSection = ({ articleId }: CommentsSectionProps) => {
     <section className="mt-8">
       <h2 className="font-display text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
         <MessageCircle className="w-5 h-5" />
-        Komentarze ({comments.length})
+        Komentarze ({totalCount})
       </h2>
 
       {/* Add Comment Form */}
@@ -145,6 +177,15 @@ export const CommentsSection = ({ articleId }: CommentsSectionProps) => {
               </div>
             </article>
           ))}
+
+          {/* Load More Trigger */}
+          <div ref={loadMoreRef} className="py-4">
+            {isFetchingNextPage && (
+              <div className="flex justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </section>
