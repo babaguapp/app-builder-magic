@@ -78,6 +78,41 @@ export const useDeleteExpert = () => {
   });
 };
 
+export type CreateExpertData = {
+  name: string;
+  specialty: string;
+  category: string;
+  city: string;
+  gender: string;
+  bio?: string;
+  user_id?: string;
+  rate_online?: number;
+  rate_in_person?: number;
+  offers_online?: boolean;
+  offers_in_person?: boolean;
+};
+
+export const useCreateExpert = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateExpertData) => {
+      const { error } = await supabase
+        .from("experts")
+        .insert(data);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-experts"] });
+      toast.success("Ekspert został dodany");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+};
+
 // Articles management
 export const useAdminArticles = () => {
   return useQuery({

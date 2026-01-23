@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAdminExperts, useUpdateExpert, useDeleteExpert } from "@/hooks/useAdminData";
-import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { CreateExpertDialog } from "@/components/admin/CreateExpertDialog";
 import {
   Table,
   TableBody,
@@ -40,13 +39,16 @@ const AdminExperts = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            Eksperci
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Zarządzanie ekspertami ({experts.length})
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+              Eksperci
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Zarządzanie ekspertami ({experts.length})
+            </p>
+          </div>
+          <CreateExpertDialog />
         </div>
 
         <div className="border border-border rounded-lg overflow-x-auto">
