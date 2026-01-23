@@ -6,8 +6,9 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Clock, Heart, MessageCircle, Search } from "lucide-react";
+import { Clock, MessageCircle, Search } from "lucide-react";
 import { useArticles, useArticleCategories } from "@/hooks/useArticles";
+import { LikeButton } from "@/components/articles/LikeButton";
 
 const Posts = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -118,10 +119,7 @@ const Posts = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-muted-foreground">
-                          <Heart className="w-4 h-4" />
-                          <span className="text-xs">{article.likes}</span>
-                        </span>
+                        <LikeButton articleId={article.id} size="sm" />
                         <span className="flex items-center gap-1 text-muted-foreground">
                           <MessageCircle className="w-4 h-4" />
                           <span className="text-xs">{article.comments}</span>

@@ -9,13 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ArrowLeft, 
   Clock, 
-  Heart, 
   MessageCircle, 
   Bookmark, 
   Share2,
   Calendar
 } from "lucide-react";
 import { useArticle } from "@/hooks/useArticles";
+import { LikeButton } from "@/components/articles/LikeButton";
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,9 +123,7 @@ const PostDetail = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Heart className="w-5 h-5" />
-                </Button>
+                <LikeButton articleId={article.id} variant="icon" />
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Bookmark className="w-5 h-5" />
                 </Button>
@@ -163,8 +161,7 @@ const PostDetail = () => {
           {/* Engagement Stats */}
           <div className="flex items-center justify-center gap-8 py-6 border-t border-b border-border">
             <div className="flex items-center gap-2">
-              <Heart className="w-5 h-5 text-muted-foreground" />
-              <span className="font-medium">{article.likes}</span>
+              <LikeButton articleId={article.id} />
               <span className="text-muted-foreground">polubień</span>
             </div>
             <div className="flex items-center gap-2">
